@@ -1,0 +1,563 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raedon's Edge | Shibuya 3026</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=UnifrakturCook:wght@700&display=swap');
+
+:root {
+    --white: #f5f5f5;
+    --red: #8f111b;
+    --black: #030303;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Cinzel', serif;
+    overflow: hidden;
+}
+
+/* Background cross */
+
+.cross {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.07;
+    transform: rotate(-25deg) scale(1.5);
+}
+
+.cross::before,
+.cross::after {
+    content: "";
+    position: absolute;
+    background: white;
+}
+
+.cross::before {
+    width: 14%;
+    height: 100%;
+    left: 43%;
+}
+
+.cross::after {
+    width: 100%;
+    height: 14%;
+    top: 35%;
+}
+
+/* Main screen */
+
+.screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.7s ease, transform 1s ease;
+}
+
+#intro {
+    z-index: 2;
+}
+
+#intro h1 {
+    font-family: 'UnifrakturCook', cursive;
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    letter-spacing: 4px;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    font-size: 0.8rem;
+    letter-spacing: 8px;
+    opacity: 0.5;
+    margin-bottom: 40px;
+}
+
+.skull-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: clamp(160px, 28vw, 280px);
+    transition: transform 0.5s ease, filter 0.5s ease;
+    filter: drop-shadow(0 0 12px #ffffff20);
+}
+
+.skull-button:hover {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 25px #ffffff70);
+}
+
+.skull-button svg {
+    width: 100%;
+    display: block;
+}
+
+.mouth {
+    transform-origin: 100px 150px;
+    transition: transform 0.4s ease;
+}
+
+.skull-button.open .mouth {
+    transform: translateY(22px) scaleY(1.4);
+}
+
+.enter-text {
+    margin-top: 25px;
+    font-size: 0.7rem;
+    letter-spacing: 5px;
+    opacity: 0.45;
+}
+
+/* Zoom transition */
+
+body.entering #intro {
+    transform: scale(8);
+    opacity: 0;
+}
+
+body.entering #links {
+    opacity: 1;
+    transform: scale(1);
+}
+
+#links {
+    opacity: 0;
+    transform: scale(0.85);
+    z-index: 1;
+    pointer-events: none;
+}
+
+#links.active {
+    pointer-events: auto;
+}
+
+/* Link pages */
+
+.page {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 90%;
+    max-width: 750px;
+    animation: fadeIn 0.6s ease;
+}
+
+.page.active {
+    display: flex;
+}
+
+.page h2 {
+    font-family: 'UnifrakturCook', cursive;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    margin-bottom: 35px;
+}
+
+.link-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: clamp(0.8rem, 2vw, 1.1rem);
+    letter-spacing: 2px;
+}
+
+.link-label {
+    opacity: 0.5;
+}
+
+.arrow {
+    color: var(--red);
+    font-size: 1.8rem;
+    font-family: serif;
+}
+
+.link-value {
+    color: white;
+    text-decoration: none;
+    border-bottom: 1px solid #ffffff30;
+    padding-bottom: 5px;
+    transition: 0.3s;
+}
+
+.link-value:hover {
+    color: #b52b35;
+    border-color: #b52b35;
+}
+
+.discord-icon {
+    width: 35px;
+    height: 35px;
+    fill: white;
+    transition: 0.3s;
+}
+
+.discord-icon:hover {
+    fill: #5865F2;
+}
+
+.guilds {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    font-size: clamp(1rem, 3vw, 1.5rem);
+}
+
+.guild {
+    text-decoration: none;
+    color: white;
+    transition: 0.3s;
+    letter-spacing: 3px;
+}
+
+.guild:hover {
+    color: var(--red);
+    transform: scale(1.05);
+}
+
+.navigation {
+    display: flex;
+    align-items: center;
+    gap: 35px;
+    margin-top: 65px;
+}
+
+.nav-arrow {
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'UnifrakturCook', cursive;
+    font-size: 3rem;
+    transition: 0.3s;
+}
+
+.nav-arrow:hover {
+    color: var(--red);
+    transform: scale(1.2);
+}
+
+.page-counter {
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    opacity: 0.4;
+}
+
+.back {
+    position: absolute;
+    bottom: 30px;
+    background: none;
+    border: none;
+    color: white;
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    opacity: 0.35;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.back:hover {
+    opacity: 1;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 600px) {
+    .link-row {
+        gap: 12px;
+    }
+
+    .navigation {
+        margin-top: 45px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="cross"></div>
+
+<!-- INTRO SCREEN -->
+
+<section class="screen" id="intro">
+
+    <h1>Raedon's Edge</h1>
+
+    <p class="subtitle">SHIBUYA 3026</p>
+
+    <button class="skull-button" id="skull" aria-label="Enter Raedon's Edge">
+        <svg viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg">
+
+            <!-- Skull -->
+            <path d="
+                M100 12
+                C43 12 25 53 30 102
+                C32 132 49 148 63 160
+                L63 194
+                L137 194
+                L137 160
+                C151 148 168 132 170 102
+                C175 53 157 12 100 12 Z"
+                fill="#f0f0f0"/>
+
+            <!-- Eye sockets -->
+            <path d="M45 91 L65 70 L85 91 L65 112 Z" fill="#030303"/>
+            <path d="M115 91 L135 70 L155 91 L135 112 Z" fill="#030303"/>
+
+            <!-- Nose -->
+            <path d="M100 108 L87 133 L113 133 Z" fill="#030303"/>
+
+            <!-- Upper teeth -->
+            <rect x="68" y="147" width="64" height="20" fill="#030303"/>
+
+            <g stroke="#f0f0f0" stroke-width="3">
+                <path d="M80 147 V167"/>
+                <path d="M93 147 V167"/>
+                <path d="M106 147 V167"/>
+                <path d="M119 147 V167"/>
+            </g>
+
+            <!-- Opening jaw -->
+            <g class="mouth">
+                <path d="
+                    M63 172
+                    L137 172
+                    L133 202
+                    L100 220
+                    L67 202 Z"
+                    fill="#f0f0f0"/>
+
+                <path d="M69 173 H131 L128 188 H72 Z" fill="#030303"/>
+
+                <g stroke="#030303" stroke-width="3">
+                    <path d="M84 174 V187"/>
+                    <path d="M100 174 V187"/>
+                    <path d="M116 174 V187"/>
+                </g>
+            </g>
+
+        </svg>
+    </button>
+
+    <p class="enter-text">CLICK THE SKULL TO ENTER</p>
+
+</section>
+
+<!-- LINKS SCREEN -->
+
+<section class="screen" id="links">
+
+    <!-- PAGE 1: DISCORD USER -->
+
+    <div class="page active">
+
+        <h2>Discord User</h2>
+
+        <div class="link-row">
+            <span class="link-label">Discord User</span>
+
+            <span class="arrow">⟶</span>
+
+            <span class="link-value">m.4z.</span>
+        </div>
+
+    </div>
+
+    <!-- PAGE 2: DISCORD SERVER -->
+
+    <div class="page">
+
+        <h2>Discord Server</h2>
+
+        <div class="link-row">
+
+            <span class="link-label">Server</span>
+
+            <span class="arrow">⟶</span>
+
+            <a
+                class="link-value"
+                href="https://discord.gg/TXGWkgsCGT"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                <svg class="discord-icon" viewBox="0 0 24 24"
+                     xmlns="http://www.w3.org/2000/svg"
+                     aria-label="Discord">
+                    <path d="M19.73 4.36A19.26 19.26 0 0 0 15.06 3
+                    c-.2.36-.43.84-.59 1.22a17.76 17.76 0 0 0-4.94 0
+                    C9.37 3.84 9.14 3.36 8.94 3
+                    a19.2 19.2 0 0 0-4.67 1.36
+                    C1.31 8.78.51 13.08.91 17.32
+                    a19.4 19.4 0 0 0 5.73 2.9
+                    c.46-.63.87-1.3 1.22-2.01
+                    -.67-.25-1.32-.56-1.94-.92
+                    .16-.12.32-.24.47-.37
+                    3.74 1.75 7.8 1.75 11.5 0
+                    .15.13.31.25.47.37
+                    -.62.36-1.27.67-1.94.92
+                    .35.71.76 1.38 1.22 2.01
+                    a19.3 19.3 0 0 0 5.73-2.9
+                    c.47-4.92-.8-9.18-3.64-12.96ZM8.02 14.86
+                    c-1.12 0-2.04-1.02-2.04-2.27
+                    0-1.25.9-2.27 2.04-2.27
+                    1.15 0 2.06 1.02 2.04 2.27
+                    0 1.25-.9 2.27-2.04 2.27Zm7.96 0
+                    c-1.12 0-2.04-1.02-2.04-2.27
+                    0-1.25.9-2.27 2.04-2.27
+                    1.15 0 2.06 1.02 2.04 2.27
+                    0 1.25-.9 2.27-2.04 2.27Z"/>
+                </svg>
+                Join the Server
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- PAGE 3: ALLIED GUILDS -->
+
+    <div class="page">
+
+        <h2>Allied Guilds</h2>
+
+        <div class="guilds">
+
+            <a class="guild" href="#" target="_blank">
+                Blackout Sahurs
+            </a>
+
+            <a class="guild" href="#" target="_blank">
+                Jujutsu Order
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- GOTHIC NAVIGATION -->
+
+    <div class="navigation">
+
+        <button class="nav-arrow" id="prev" aria-label="Previous page">
+            ❮
+        </button>
+
+        <span class="page-counter" id="counter">01 / 03</span>
+
+        <button class="nav-arrow" id="next" aria-label="Next page">
+            ❯
+        </button>
+
+    </div>
+
+    <button class="back" id="back">
+        RETURN TO THE VOID
+    </button>
+
+</section>
+
+<script>
+const skull = document.getElementById("skull");
+const intro = document.getElementById("intro");
+const links = document.getElementById("links");
+const pages = document.querySelectorAll(".page");
+const counter = document.getElementById("counter");
+
+let currentPage = 0;
+let entered = false;
+
+function enterSite() {
+    if (entered) return;
+
+    entered = true;
+
+    skull.classList.add("open");
+    document.body.classList.add("entering");
+
+    setTimeout(() => {
+        intro.style.display = "none";
+        links.classList.add("active");
+    }, 1000);
+}
+
+skull.addEventListener("click", enterSite);
+
+function showPage(index) {
+    currentPage = (index + pages.length) % pages.length;
+
+    pages.forEach((page, i) => {
+        page.classList.toggle("active", i === currentPage);
+    });
+
+    counter.textContent =
+        String(currentPage + 1).padStart(2, "0") +
+        " / " +
+        String(pages.length).padStart(2, "0");
+}
+
+document.getElementById("next").addEventListener("click", () => {
+    showPage(currentPage + 1);
+});
+
+document.getElementById("prev").addEventListener("click", () => {
+    showPage(currentPage - 1);
+});
+
+document.getElementById("back").addEventListener("click", () => {
+    links.classList.remove("active");
+    document.body.classList.remove("entering");
+
+    setTimeout(() => {
+        intro.style.display = "flex";
+        skull.classList.remove("open");
+        entered = false;
+    }, 500);
+});
+
+document.addEventListener("keydown", (event) => {
+    if (!entered) return;
+
+    if (event.key === "ArrowRight") {
+        showPage(currentPage + 1);
+    }
+
+    if (event.key === "ArrowLeft") {
+        showPage(currentPage - 1);
+    }
+});
+</script>
+
+</body>
+</html>
